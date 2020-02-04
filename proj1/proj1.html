@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Yuhong Chen</title>
+    
+    <!-- Bootstrap core CSS -->
+    <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom fonts for this template -->
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+          type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800"
+          rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Quattrocento" rel="stylesheet">
+    
+    <!-- Custom styles for this template -->
+    <link href="../assets/css/main.css" rel="stylesheet">
+
+</head>
+<body>
+
+<!-- Page Header -->
+<header class="masthead">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h2>Images of the Russian Empire: Colorizing the Prokudin-Gorskii photo collection</h2>
+                    <span class="subheading">CS 194-26 SP20 Project 1</span>
+                    <br>
+                    <span class="subheading">Yuhong Chen</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container note-section">
+    <ul>
+        <li class="note-block">
+            <h3>Background</h3>
+            <hr class="note-line">
+            <p>
+                &emsp;&emsp;&emsp;&emsp; Sergei Mikhailovich Prokudin-Gorskii was a man truly ahead of his time. As
+                early as 1907, he was
+                convinced that color photography would be BIG. He travelled around the Russian Empire and took pictures
+                of everything he saw, even though there was no way to print the color photographs.
+                <br><br>
+                &emsp;&emsp;&emsp;&emsp; The idea is simple: he took photographs of the same scene using a red, a green,
+                and a blue filter. If one were to align the three color channels in the right way, the color image would
+                be reconstructed. In this project, we're going to do just that.
+            </p>
+        </li>
+        
+        <li class="note-block">
+            <h3>Approach</h3>
+            <hr class="note-line">
+            <p>
+                &emsp;&emsp;&emsp;&emsp; The basic assumption for aligning the color channels is that the aligned pixels
+                in each channel would have a similar brightness. So by comparing the different channels and taking the
+                Sum of Squared Differences, also known as the L2-norm, we can find the best offset for alignment by
+                choosing the one with the least difference in brightness between channels. We call this approach the
+                L2-loss approach.
+                <br><br>
+                &emsp;&emsp;&emsp;&emsp; For small images with about 400x400 pixels, the offset for each axis is usually
+                less than 15. So we can easily do an exhaustive search for such images. But for larger images with more
+                than 3000x3000 pixels, such a search becomes computationally expensive. To fix this, we adopt a pyramid
+                search method, searching at smaller scales first, which allows us to search over large areas quickly,
+                and then switching to larger scales to locate the exact offset.
+            </p>
+        </li>
+        
+        <li class="note-block">
+            <h3>Results</h3>
+            <hr class="note-line">
+            <div class="container row">
+                <div class="col-md-4">
+                    <img src="out/l2_loss-original-(2, 5)-(3, 12)-cathedral.jpg" alt="">
+                    <br><br>
+                    cathedral.jpg G:(2, 5), R:(3, 12)
+                </div>
+                <div class="col-md-4">
+                    <img src="out/l2_loss-original-(2, -3)-(2, 3)-monastery.jpg" alt="">
+                    <br><br>
+                    monastery.jpg G:(2, -3), R:(2, 3)
+                </div>
+                <div class="col-md-4">
+                    <img src="out/l2_loss-original-(9, 51)-(11, 112)-lady.jpg" alt="">
+                    <br><br>
+                    lady.tif G:(9, 51), R:(11, 112)
+                </div>
+            </div>
+            <div class="container row">
+                <div class="col-md-4">
+                    <img src="out/l2_loss-original-(10, 81)-(13, 178)-melons.jpg" alt="">
+                    <br><br>
+                    melons.tif G:(10, 81), R:(13, 178)
+                </div>
+                <div class="col-md-4">
+                    <img src="out/l2_loss-original-(16, 59)-(13, 123)-harvesters.jpg" alt="">
+                    <br><br>
+                    harvesters.tif G:(16, 59), R:(13, 123)
+                </div>
+                <div class="col-md-4">
+                    <img src="out/l2_loss-original-(17, 41)-(23, 89)-icon.jpg" alt="">
+                    <br><br>
+                    icon.tif G:(17, 41), R:(23, 89)
+                </div>
+            </div>
+        </li>
+        
+        <li class="note-block">
+            <h3>Bells and Whistles</h3>
+            <hr class="note-line">
+            <br>
+            <h4>L2-loss on Edge Maps</h4>
+            <p>
+                &emsp;&emsp;&emsp;&emsp; After using the naive L2-loss, I decided to try using edge maps for alignment.
+                I used the Roberts Edge Detection algorithm to generate an edge map of each image, and then applied
+                L2-Loss to the edge maps. Most of the images were already pretty well aligned, so there wasn't much
+                visible improvement for them, but the result for emir.tif aligned using the edge map was much better
+                than the result from just L2-Loss:
+                <br>
+                <br>
+            </p>
+            <div class="container row">
+                <div class="col-md-6">
+                    aligned with plain L2-loss
+                    <br><br>
+                    <img src="out/l2_loss-original-(24, 49)-(55, 103)-emir.jpg" alt="">
+                    <br><br>
+                    emir.tif G:(24, 49), R:(55, 103)
+                </div>
+                <div class="col-md-6">
+                    aligned with L2-loss computed on the edge map
+                    <br><br>
+                    <img src="out/roberts_loss-original-(24, 49)-(40, 107)-emir.jpg" alt="">
+                    <br><br>
+                    emir.tif G:(24, 49), R:(40, 107)
+                </div>
+            </div>
+            <br>
+            <br>
+            <p>
+            &emsp;&emsp;&emsp;&emsp; Zooming in on Emir's face, you can see that the plain L2-loss result created a
+            halo-like artifact due to the red layer being misaligned, whereas the edge map computed loss produced a much
+            clearer face.
+            <br>
+            <br>
+            &emsp;&emsp;&emsp;&emsp; However, using edge maps was detrimental when aligning images with a natural
+            landscape background, as those images generated noisy edge maps that interfered with alignment. This effect
+            is visible with the results for self_portrait.tif.
+            <br>
+            <br>
+            </p>
+            <div class="container row">
+                <div class="col-md-6">
+                    aligned with plain L2-loss
+                    <br><br>
+                    <img src="out/l2_loss-original-(29, 78)-(37, 176)-self_portrait.jpg" alt="">
+                    <br><br>
+                    self_portrait.tif G:(29, 78), R:(37, 176)
+                </div>
+                <div class="col-md-6">
+                    aligned with L2-loss computed on the edge map
+                    <br><br>
+                    <img src="out/roberts_loss-original-(29, 78)-(0, 1)-self_portrait.jpg" alt="">
+                    <br><br>
+                    self_portrait.tif G:(29, 78), R:(0, 1)
+                </div>
+            </div>
+            <br>
+            <br>
+            <h4>Adaptive Histogram Equalization</h4>
+            <p>
+                &emsp;&emsp;&emsp;&emsp; As some of the pictures in the collection appeared to be over-exposed, I wanted
+                to apply automatic contrast adjustment to the images. I used the "equalize_adapthist" function available
+                in the skimage library to apply Contrast Limited Adaptive Histogram Equalization to the input images.
+                The results yielded more natural looking images for some inputs, but generated a pastel-like texture for
+                others.
+                <br>
+                <br>
+                &emsp;&emsp;&emsp;&emsp; For example, the output for workshop.tif looked more realistic after Adaptive
+                Histogram Equalization, but the output for onion_church.tif gained a more artificial feeling.
+                <br>
+                <br>
+            </p>
+            <div class="container row">
+                <div class="col-md-6">
+                    Without Adaptive Histogram Equalization
+                    <br><br>
+                    <img src="out/roberts_loss-original-(-1, 53)-(-12, 105)-workshop.jpg" alt="">
+                    <br><br>
+                    workshop.tif G:(-1, 53), R:(-12, 105)
+                </div>
+                <div class="col-md-6">
+                    With Adaptive Histogram Equalization
+                    <br><br>
+                    <img src="out/roberts_loss-adjusted-(4, 51)-(-7, 106)-workshop.jpg" alt="">
+                    <br><br>
+                    workshop.tif G:(4, 51), R:(-7, 106)
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="container row">
+                <div class="col-md-6">
+                    Without Adaptive Histogram Equalization
+                    <br><br>
+                    <img src="out/roberts_loss-original-(25, 52)-(35, 107)-onion_church.jpg" alt="">
+                    <br><br>
+                    onion_church.tif G:(25, 52), R:(35, 107)
+                </div>
+                <div class="col-md-6">
+                    With Adaptive Histogram Equalization
+                    <br><br>
+                    <img src="out/roberts_loss-adjusted-(26, 51)-(36, 107)-onion_church.jpg" alt="">
+                    <br><br>
+                    onion_church.tif G:(26, 51), R:(36, 107)
+                </div>
+            </div>
+            <br>
+        </li>
+        <li class="note-block">
+            <h3>All Outputs</h3>
+            <hr class="note-line">
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(0, 53)-(-12, 105)-workshop.jpg" alt="">
+                    <br><br>
+                    workshop.tif G:(0, 53), R:(-12, 105)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(2, -3)-(2, 3)-monastery.jpg" alt="">
+                    <br><br>
+                    monastery.tif G:(2, -3), R:(2, 3)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(2, 5)-(3, 12)-cathedral.jpg" alt="">
+                    <br><br>
+                    cathedral.tif G:(2, 5), R:(3, 12)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(3, 3)-(3, 6)-tobolsk.jpg" alt="">
+                    <br><br>
+                    tobolsk.tif G:(3, 3), R:(3, 6)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(5, 42)-(32, 87)-train.jpg" alt="">
+                    <br><br>
+                    train.tif G:(5, 42), R:(32, 87)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(9, 51)-(11, 112)-lady.jpg" alt="">
+                    <br><br>
+                    lady.tif G:(9, 51), R:(11, 112)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(10, 81)-(13, 178)-melons.jpg" alt="">
+                    <br><br>
+                    melons.tif G:(10, 81), R:(13, 178)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(12, 64)-(22, 137)-village.jpg" alt="">
+                    <br><br>
+                    village.tif G:(12, 64), R:(22, 137)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(14, 53)-(11, 112)-three_generations.jpg" alt="">
+                    <br><br>
+                    three_generations.tif G:(14, 53), R:(11, 112)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(16, 59)-(13, 123)-harvesters.jpg" alt="">
+                    <br><br>
+                    harvesters.tif G:(16, 59), R:(13, 123)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(17, 41)-(23, 89)-icon.jpg" alt="">
+                    <br><br>
+                    icon.tif G:(17, 41), R:(23, 89)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(19, 62)-(26, 134)-00935u.jpg" alt="">
+                    <br><br>
+                    00935u.tif G:(19, 62), R:(26, 134)
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(24, 10)-(42, 48)-01061u.jpg" alt="">
+                    <br><br>
+                    01061u.tif G:(24, 10), R:(42, 48)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(24, 49)-(55, 103)-emir.jpg" alt="">
+                    <br><br>
+                    emir.tif G:(24, 49), R:(55, 103)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(26, 51)-(36, 108)-onion_church.jpg" alt="">
+                    <br><br>
+                    onion_church.tif G:(26, 51), R:(36, 108)
+                </div>
+                <div class="col-md-3">
+                    <img src="out/l2_loss-original-(29, 78)-(37, 176)-self_portrait.jpg" alt="">
+                    <br><br>
+                    self_portrait.tif G:(29, 78), R:(37, 176)
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="../assets/vendor/jquery/jquery.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom scripts for this template -->
+<script src="../assets/js/clean-blog.min.js"></script>
+
+</body>
+</html>

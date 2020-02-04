@@ -144,8 +144,9 @@ def procedure(imname, equalize, used_loss):
 if __name__ == "__main__":
     equalize = sys.argv[1] == "Y"
     for imname in os.listdir(data_dir):
-        for used_loss in (l2_loss, roberts_loss):
-            procedure(imname, equalize, used_loss)
+        if imname.endswith("u.tif"):
+            for used_loss in (l2_loss, roberts_loss):
+                procedure(imname, equalize, used_loss)
 
 # display the image
 # skio.imshow(im_out)
