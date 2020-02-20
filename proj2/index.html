@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Yuhong Chen</title>
+    
+    <!-- Bootstrap core CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom fonts for this template -->
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet"
+          type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800"
+          rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Quattrocento" rel="stylesheet">
+    
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+</head>
+<body>
+
+<!-- Page Header -->
+<header class="masthead">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h2>Fun with Filters and Frequencies</h2>
+                    <span class="subheading">CS 194-26 SP20 Project 2</span>
+                    <br>
+                    <span class="subheading">Yuhong Chen</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container note-section">
+    <ul>
+        <li class="note-block">
+            <h3>Part 1. Fun with Filters</h3>
+            <hr class="note-line">
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        &emsp;&emsp;&emsp;&emsp; In this part, we play with 2D convolutions and filtering.
+                    </p>
+                </div>
+            </div>
+            <h4>Part 1.1 Finite Difference Operator</h4>
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        &emsp;&emsp;&emsp;&emsp; We will begin by using the humble finite difference as our filter in
+                        the x and y directions. The finite difference filter just takes the difference of neighboring
+                        pixels.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data/dx.png" alt="">
+                </div>
+                <div class="col-md-4">
+                    <img src="data/dy.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div style="text-align: center;">dx</div>
+                </div>
+                <div class="col-md-4">
+                    <div style="text-align: center;">dy</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <p>Taking the square norm of the two pictures gives the gradient magnitudes, and then thresholding
+                        it gives a basic edge image.</p>
+                    <img src="data/gradmag.png" alt="">
+                </div>
+            </div>
+            <br>
+            <h4>Part 1.2 Derivative of Gaussian (DoG) Filter</h4>
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        &emsp;&emsp;&emsp;&emsp; The edge image from part 1.1 is noisy, and we want to improve upon it
+                        by smoothing the image to remove the noise. We can blur the image before applying the finite
+                        difference operator. By using convolutions, we can merge the two operations into one
+                        convolution, using the DoG filter.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data/dogx.png" alt="">
+                </div>
+                <div class="col-md-4">
+                    <img src="data/dogy.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div style="text-align: center;">Derivative of Gaussian in the x direction</div>
+                </div>
+                <div class="col-md-4">
+                    <div style="text-align: center;">Derivative of Gaussian in the y direction</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        &emsp;&emsp;&emsp;&emsp; Using DoG filters instead of the difference operator gives us smoother
+                        results after applying our threshold.
+                    </p>
+                    <img src="data/dog_mag.png" alt="">
+                </div>
+            </div>
+            <br>
+            <h4>Part 1.3 Image Straightening</h4>
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        &emsp;&emsp;&emsp;&emsp; By using the arctan function in the image gradients, we can calculate
+                        the angle of the gradients. Using a histogram of the angles, we can find a rotation that
+                        maximizes the number of horizontal and vertical gradients in a picture, which will straighten
+                        the picture.
+                        <br>
+                        &emsp;&emsp;&emsp;&emsp; The histogram on the left shows the orientations of the original image,
+                        and the right one is the straightened image.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data/facade.jpg" alt="">
+                </div>
+                <div class="col-md-4">
+                    <img src="data/straight_facade.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="data/facade_hists.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        &emsp;&emsp;&emsp;&emsp; However, with images which have straight lines on the ground or places
+                        not perpendicular to the ground, this method will not work so well.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data/straight_fail_orig.JPG" alt="">
+                </div>
+                <div class="col-md-4">
+                    <img src="data/straight_fail.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="data/fail_hists.png" alt="">
+                </div>
+            </div>
+            <div class="col-md-8">
+                <p>
+                    &emsp;&emsp;&emsp;&emsp; More examples:
+                </p>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data/building.jpg" alt="">
+                </div>
+                <div class="col-md-4">
+                    <img src="data/building_straight.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="data/building_hists.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data/lanterns.jpg" alt="">
+                </div>
+                <div class="col-md-4">
+                    <img src="data/lanterns_straight.png" alt="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="data/lanterns_hists.png" alt="">
+                </div>
+            </div>
+        </li>
+        <li class="note-block">
+            <h3>Part 2. Fun with Frequencies</h3>
+            <hr class="note-line">
+            <div class="row">
+                <div class="col-md-8">
+                    <p>
+                        &emsp;&emsp;&emsp;&emsp; In this part, we play with the frequency domain of the image.
+                    </p>
+                </div>
+            </div>
+            <div>
+                <h4>Part 2.1 Image Sharpening</h4>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            &emsp;&emsp;&emsp;&emsp; We will use a low-pass filter to filter a blurry image, and
+                            subtract it
+                            from the original image to get the higher frequencies. We then add back the high frequencies
+                            to
+                            get a sharper image.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="data/taj.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/taj_low.png" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/taj_sharp.png" alt="">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="data/kwason.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/kwason_blur.png" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/kwason_sharp.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            &emsp;&emsp;&emsp;&emsp; We can see that for simpler images, this method works fairly well.
+                            But
+                            there were some unwanted lattice-like artifacts for the Taj image.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4>Part 2.2 Hybrid Images</h4>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            &emsp;&emsp;&emsp;&emsp; We can blend two images together at different frequencies to create
+                            a
+                            hybrid image that looks like image A up close and image B at a distance.
+                            <br>
+                            &emsp;&emsp;&emsp;&emsp; Here we show the hybrid images and their fourier analysis.
+                        </p>
+                        <br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="data/DerekPicture.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/nutmeg.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/hybrid_derek.png" alt="">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/derek_fft.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/derek_low_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Derek FFT
+                    </div>
+                    <div class="col-md-4">
+                        Low Pass Derek FFT
+                    </div>
+                </div>
+                
+                <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/nutmeg_fft.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/nutmeg_high_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Nutmeg FFT
+                    </div>
+                    <div class="col-md-4">
+                        High Pass Nutmeg FFT
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-8">
+                        <img src="data/hybrid_derek_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        Merged FFT
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="data/daddy.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/quokka.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/hybrid_daddy.png" alt="">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/daddy_fft.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/daddy_low_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Daddy Denero FFT
+                    </div>
+                    <div class="col-md-4">
+                        Low Pass Daddy Denero FFT
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/quokka_fft.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/quokka_high_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Quokka FFT
+                    </div>
+                    <div class="col-md-4">
+                        High Pass Quokka FFT
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-8">
+                        <img src="data/hybrid_daddy_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        Merged FFT
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="data/art.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/patrick.jpg" alt="">
+                    </div>
+                    <div class="col-md-3">
+                        <img src="data/hybrid_patrick.png" alt="">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/patxplosion_fft.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/xplosion_low_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Patrick-Shaped Explosion FFT
+                    </div>
+                    <div class="col-md-4">
+                        Low Pass Patrick-Shaped Explosion FFT
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/patrick_fft.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/patrick_high_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Patrick FFT
+                    </div>
+                    <div class="col-md-4">
+                        High Pass Patrick FFT
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-8">
+                        <img src="data/patxplosion_fft.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        Merged FFT
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            &emsp;&emsp;&emsp;&emsp; The last example didn't work very well because I couldn't align
+                            patrick's head.
+                        </p>
+                        <br>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4>Part 2.3 Gaussian and Laplacian Stacks</h4>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            &emsp;&emsp;&emsp;&emsp; We use a series of gaussian kernels to analyze images at different
+                            frequencies.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            Gaussian Stack:
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/lg0.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/lg1.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/lg2.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/lg3.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            Laplacian Stack:
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/ll0.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/ll1.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="data/ll2.png" alt="">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data/ll3.png" alt="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            The Laplacian stack is generated from the differences between layers in the Gaussian stack,
+                            and lets us see different "bands" of frequencies. Whereas the Gaussian stack simulates
+                            seeing the image at different distances.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4>Part 2.4 Multiresolution Blending</h4>
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>
+                            &emsp;&emsp;&emsp;&emsp; We apply gaussian and laplacian stacks for blending images at
+                            different resolutions. Different frequencies of the image get blended to a different degree.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <img src="data/oraple.png" alt="">
+                        <br>
+                        oraple
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <img src="data/apprange.png" alt="">
+                        <br>
+                        apprange
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <img src="data/patxplosion.png" alt="">
+                        <br>
+                        Patxplosion
+                    </div>
+                </div>
+            </div>
+        </li>
+    
+    </ul>
+
+</div>
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="assets/vendor/jquery/jquery.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom scripts for this template -->
+<script src="assets/js/clean-blog.min.js"></script>
+
+</body>
+</html>

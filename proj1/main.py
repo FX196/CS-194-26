@@ -82,7 +82,7 @@ def align(inp, target, center_x=0, center_y=0, search_range=15, crop_percentage=
                 curr_shift = (i, j)
     aligned = np.roll(inp, curr_shift[0], axis=0)
     aligned = np.roll(aligned, curr_shift[1], axis=1)
-    # print(curr_shift)
+    print(curr_shift)
     return (aligned,) + curr_shift
 
 
@@ -138,15 +138,17 @@ def procedure(imname, equalize, used_loss):
             f'({int(r_shift_x)}, {int(r_shift_y)})-{imname.split(".")[0]}.jpg'
     skio.imsave(fname, im_out)
 
+
 # align the images
 # functions that might be useful for aligning the images include:
 # np.roll, np.sum, sk.transform.rescale (for multiscale)
 if __name__ == "__main__":
-    equalize = sys.argv[1] == "Y"
-    for imname in os.listdir(data_dir):
-        if imname.endswith("u.tif"):
-            for used_loss in (l2_loss, roberts_loss):
-                procedure(imname, equalize, used_loss)
+    # equalize = sys.argv[1] == "Y"
+    # for imname in os.listdir(data_dir):
+    #     if imname.endswith("u.tif"):
+    #         for used_loss in (l2_loss, roberts_loss):
+    #             procedure(imname, equalize, used_loss)
+    procedure("emir.tif", False, l2_loss)
 
 # display the image
 # skio.imshow(im_out)
